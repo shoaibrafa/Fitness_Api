@@ -26,6 +26,19 @@ public interface ClientMembershipRepository extends JpaRepository<Client_Members
             "    WHERE cm.client_id = cm2.client_id and\n" +
             "          cm.client_id = ?1)",nativeQuery = true)
     Client_Membership  findClient_MembershipByEnd_date(String id);
+    
+    
+    
+    /**
+     * This method returns the total balance of the all clients' memberships.
+     * @return
+     */
+    @Query(value = "SELECT SUM(BALANCE) FROM client_membership", nativeQuery = true)
+    Long sumClientMembershipBalance();
+    
+    
+    
+    
 
     /**
      * This method is used to create a new client_membership.
