@@ -59,12 +59,14 @@ public class ClientRestController {
         Date date = new Date();
         Date memEndDate;
         for (Client c : clients) {
-            memEndDate = sdf.parse(getDate(c.getId()));
-            if (memEndDate.after(date)) {
-                c.setStatus("Active");
-            } else if (memEndDate.before(date)) {
-                c.setStatus("Inactive");
-            } else {
+        	try {
+                memEndDate = sdf.parse(getDate(c.getId()));
+                if (memEndDate.after(date)) {
+                    c.setStatus("Active");
+                } else if (memEndDate.before(date)) {
+                    c.setStatus("Inactive");
+                } 
+        	}catch(NullPointerException ex) {
                 c.setStatus("No Membership");
             }
         }
@@ -75,7 +77,7 @@ public class ClientRestController {
      * This method returns is used to get client last membership date.
      * It is used in getClients() method.
      */
-    public String getDate(String id) {
+    public String getDate(String id) throws NullPointerException {
         return clientMembershipRepository.findClient_MembershipByEnd_date(id).getEnd_date().toString();
     }
 
