@@ -65,13 +65,41 @@ public class ClientRestController {
                     c.setStatus("Active");
                 } else if (memEndDate.before(date)) {
                     c.setStatus("Inactive");
-                } 
+                }
         	}catch(NullPointerException ex) {
                 c.setStatus("No Membership");
             }
         }
         return clients;
     }
+    
+    
+    /**
+     * This method returns all clients based on his name.
+     * This method is usually used for searching purposes.
+     */
+    @GetMapping("restclients/search/{name}")
+    public List<Client> searchClient(@PathVariable("name") String name) throws ParseException {
+        List<Client> clients = clientRepo.findByNameStartsWith(name);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        Date memEndDate;
+        for (Client c : clients) {
+        	try {
+                memEndDate = sdf.parse(getDate(c.getId()));
+                if (memEndDate.after(date)) {
+                    c.setStatus("Active");
+                } else if (memEndDate.before(date)) {
+                    c.setStatus("Inactive");
+                }
+        	}catch (NullPointerException ex) {
+                c.setStatus("No Membership Found");
+        	}
+        }
+        return clients;
+    }
+    
+    
 
     /**
      * This method returns is used to get client last membership date.
@@ -93,28 +121,6 @@ public class ClientRestController {
         return c;
     }
 
-    /**
-     * This method returns all clients based on his name.
-     * This method is usually used for searching purposes.
-     */
-    @GetMapping("restclients/loadsingleclient/{name}")
-    public List<Client> searchClient(@PathVariable("name") String name) throws ParseException {
-        List<Client> clients = clientRepo.findByNameStartsWith(name);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date();
-        Date memEndDate;
-        for (Client c : clients) {
-            memEndDate = sdf.parse(getDate(c.getId()));
-            if (memEndDate.after(date)) {
-                c.setStatus("Active");
-            } else if (memEndDate.before(date)) {
-                c.setStatus("Inactive");
-            } else {
-                c.setStatus("No Membership Found");
-            }
-        }
-        return clients;
-    }
 
     /**
      * This method creates a new client. It also gets client image and stores it in
@@ -136,7 +142,7 @@ public class ClientRestController {
         java.sql.Date jDate = new java.sql.Date(formatter.parse(joiningDate).getTime());
 
         System.out.print("something here");
-        
+
         Client client = new Client();
         client.setId(id);
         client.setName(name);
